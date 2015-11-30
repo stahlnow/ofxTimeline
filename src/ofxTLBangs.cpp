@@ -43,14 +43,14 @@ ofxTLBangs::~ofxTLBangs(){
 }
 
 void ofxTLBangs::draw(){
-        
+
     if(bounds.height < 2){
         return;
     }
-    
+
     ofPushStyle();
     ofFill();
-	
+
 	//float currentPercent = powf(MIN(ofGetElapsedTimef() - lastBangTime, .5), 2);
 	float currentPercent = powf(ofMap(ofGetElapsedTimef() - lastBangTime, 0, .5, 1.0, 0,true), 2);
 	if(currentPercent > 0){
@@ -58,7 +58,7 @@ void ofxTLBangs::draw(){
 		ofFill();
 		ofRect(bounds.x, bounds.y, bounds.width, bounds.height);
 	}
-	
+
     for(int i = keyframes.size()-1; i >= 0; i--){
 		if(!isKeyframeIsInBounds(keyframes[i])){
 			continue;
@@ -77,7 +77,7 @@ void ofxTLBangs::draw(){
             ofSetLineWidth(4);
             ofSetColor(timeline->getColors().keyColor);
         }
-        
+
         ofLine(screenX, bounds.y, screenX, bounds.y+bounds.height);
     }
     ofPopStyle();
@@ -95,13 +95,13 @@ void ofxTLBangs::regionSelected(ofLongRange timeRange, ofRange valueRange){
 ofxTLKeyframe* ofxTLBangs::keyframeAtScreenpoint(ofVec2f p){
     if(bounds.inside(p.x, p.y)){
         for(int i = 0; i < keyframes.size(); i++){
-            float offset = p.x - timeline->millisToScreenX(keyframes[i]->time);            
+            float offset = p.x - timeline->millisToScreenX(keyframes[i]->time);
             if (abs(offset) < 5) {
                 return keyframes[i];
             }
         }
     }
-	return NULL;    
+	return NULL;
 }
 
 void ofxTLBangs::update(){
@@ -126,13 +126,14 @@ void ofxTLBangs::bangFired(ofxTLKeyframe* key){
     ofxTLBangEventArgs args;
     args.sender = timeline;
     args.track = this;
+    //args.pageName = this->pageName;
 	//play solo change
     //args.currentMillis = timeline->getCurrentTimeMillis();
 	args.currentMillis = currentTrackTime();
     args.currentPercent = timeline->getPercentComplete();
     args.currentFrame = timeline->getCurrentFrame();
     args.currentTime = timeline->getCurrentTime();
-    ofNotifyEvent(events().bangFired, args);    
+    ofNotifyEvent(events().bangFired, args);
 }
 
 void ofxTLBangs::playbackStarted(ofxTLPlaybackEventArgs& args){

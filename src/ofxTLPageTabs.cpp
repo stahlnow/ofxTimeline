@@ -73,7 +73,7 @@ void ofxTLPageTabs::mouseReleased(ofMouseEventArgs& args){
 }
 
 void ofxTLPageTabs::addPage(string name){
-	
+
 	Tab newPage;
 	newPage.name = name;
 	pages.push_back(newPage);
@@ -83,11 +83,44 @@ void ofxTLPageTabs::addPage(string name){
 	drawRectChanged();
 }
 
+void ofxTLPageTabs::removePage(){
+    pages.erase(pages.begin()+getSelectedPageIndex());
+    if(pages.size() == 1){
+        selectPage(0);
+    }
+    drawRectChanged();
+}
+
+void ofxTLPageTabs::movePage(bool up)
+{
+    int start = getSelectedPageIndex();
+    int dst = 0;
+
+    if (up) {
+        dst = start - 1 < 0 ? pages.size()-1 : start-1;
+    }
+
+    else {
+        dst = start + 1 > pages.size()-1 ? 0 : start + 1;
+    }
+
+    vector<Tab> tmp(pages.begin() + start, pages.begin() + start + 1);
+    pages.erase(pages.begin() + start, pages.begin() + start + 1);
+    pages.insert(pages.begin() + dst, tmp.begin(), tmp.end());
+
+    if (up)
+        selectPage( getSelectedPageIndex()-1 < 0 ? pages.size()-1 : getSelectedPageIndex()-1 );
+    else
+        selectPage( getSelectedPageIndex()+1 > pages.size()-1 ? 0 : getSelectedPageIndex()+1 );
+
+    drawRectChanged();
+}
+
 void ofxTLPageTabs::changeName(string oldName, string newName){
 	for(int i = 0; i < pages.size(); i++){
 		if(pages[i].name == oldName){
 			pages[i].name = newName;
-		}	
+		}
 	}
 }
 
@@ -95,12 +128,12 @@ void ofxTLPageTabs::selectPage(int index){
 	if(index == selectedPageIndex){
 		return;
 	}
-	
+
 	if(index >= pages.size()){
 		ofLogError("ofxTLPageTabs -- Selecting page " + ofToString(index) + " out of range");
 		return;
 	}
-	
+
 	ofxTLPageEventArgs pageEvent;
     pageEvent.sender = timeline;
 	if(selectedPageIndex != -1){
@@ -108,7 +141,7 @@ void ofxTLPageTabs::selectPage(int index){
 	}
 	pageEvent.currentPageName = pages[index].name;
 	selectedPageIndex = index;
-	
+
 	ofNotifyEvent(events().pageChanged, pageEvent);
 }
 

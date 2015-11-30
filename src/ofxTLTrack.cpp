@@ -88,7 +88,7 @@ void ofxTLTrack::setDrawRect(ofRectangle drawRect){
 ofxTimeline* ofxTLTrack::getTimeline(){
 	return timeline;
 }
-	
+
 void ofxTLTrack::setTimeline(ofxTimeline* _timeline){
 	timeline = _timeline;
 }
@@ -107,7 +107,7 @@ string ofxTLTrack::getDisplayName(){
 }
 
 string ofxTLTrack::getTrackType(){
-	return "Track";    
+	return "Track";
 }
 
 string ofxTLTrack::getName(){
@@ -116,27 +116,27 @@ string ofxTLTrack::getName(){
 
 void ofxTLTrack::_draw(){
 	ofPushStyle();
-	
+
 	if(focused){
 		ofFill();
 		ofSetColor(timeline->getColors().highlightColor, 50);
 		ofRect(bounds.x, bounds.y, bounds.width, bounds.height);
 	}
-	
+
 	ofNoFill();
 	if(hover){
 		ofSetColor(timeline->getColors().textColor);
 	}
 	else{
 		ofSetColor(timeline->getColors().outlineColor);
-	}	
+	}
 	ofRect(bounds.x, bounds.y, bounds.width, bounds.height);
 	ofPopStyle();
 
 	ofPushStyle();
     draw();
 	ofPopStyle();
-	
+
 	if(isPlaying){
 		float playheadScreenX = millisToScreenX(currentTrackTime());
 		if(isOnScreen(playheadScreenX)){
@@ -144,7 +144,7 @@ void ofxTLTrack::_draw(){
 			ofSetColor(timeline->getColors().keyColor);
 			ofLine(playheadScreenX, bounds.getMinY(), playheadScreenX, bounds.getMaxY());
 			ofPopStyle();
-		}			
+		}
 	}
 	viewIsDirty = false;
 }
@@ -167,7 +167,7 @@ void ofxTLTrack::checkLoop(){
         playbackStartTime = timeline->getTimer().getAppTimeSeconds() - currentTime;
 //        playbackStartFrame = ofGetFrameNum() - timecode.frameForSeconds(currentTime);
     }
-    
+
     if(currentTime >= timeline->getOutTimeInMillis()){
         if(timeline->getLoopType() == OF_LOOP_NONE){
             stop();
@@ -245,7 +245,7 @@ void ofxTLTrack::_mouseReleased(ofMouseEventArgs& args, long millis){
 
 void ofxTLTrack::gainedFocus(){
 	focused = true;
-    
+
     ofxTLTrackEventArgs args;
     args.sender = timeline;
     args.track = this;
@@ -256,7 +256,7 @@ void ofxTLTrack::gainedFocus(){
 
 void ofxTLTrack::lostFocus(){
     focused = false;
-    
+
     ofxTLTrackEventArgs args;
     args.sender = timeline;
     args.track = this;
@@ -303,7 +303,7 @@ void ofxTLTrack::setXMLFileName(string filename){
 }
 
 string ofxTLTrack::getXMLFilePath(){
-	return xmlFileName;	
+	return xmlFileName;
 }
 
 string ofxTLTrack::getXMLFileName(){
@@ -311,11 +311,11 @@ string ofxTLTrack::getXMLFileName(){
 }
 
 ofxTLEvents& ofxTLTrack::events(){
-	return timeline->events();    
+	return timeline->events();
 }
 
 bool ofxTLTrack::isActive(){
-	return active;    
+	return active;
 }
 
 bool ofxTLTrack::hasFocus(){
@@ -363,7 +363,7 @@ float ofxTLTrack::normalizedXtoScreenX(float x, ofRange inputRange){
 //}
 
 //int ofxTLTrack::screenXForIndex(int index){
-//	return screenXForIndex(index, timeline->getDurationInFrames());	
+//	return screenXForIndex(index, timeline->getDurationInFrames());
 //}
 
 //int ofxTLTrack::indexForScreenX(int screenX, int durationInFrames){
@@ -395,7 +395,7 @@ float ofxTLTrack::screenXForTime(float time, float durationInSeconds){
 float ofxTLTrack::timeForScreenX(float screenX, float durationInSeconds){
 	float startTime = zoomBounds.min * durationInSeconds;
 	float endTime = zoomBounds.max *durationInSeconds;
-	return ofMap(screenX, bounds.x, bounds.x+bounds.width, startTime, endTime, true);	
+	return ofMap(screenX, bounds.x, bounds.x+bounds.width, startTime, endTime, true);
 }
 
 bool ofxTLTrack::isOnScreen(float screenX){

@@ -45,24 +45,27 @@ class ofxTLFlag : public ofxTLKeyframe {
 class ofxTLFlags : public ofxTLBangs {
   public:
 	ofxTLFlags();
-	
+
 	virtual void draw();
-	
+
 	virtual bool mousePressed(ofMouseEventArgs& args, long millis);
     virtual void mouseDragged(ofMouseEventArgs& args, long millis);
 	virtual void mouseReleased(ofMouseEventArgs& args, long millis);
-	
+
 	virtual void keyPressed(ofKeyEventArgs& args);
 	virtual void unselectAll();
-    
+
     virtual string getTrackType();
-	
+
 	virtual void addFlag(string key);
 	virtual void addFlagAtTime(string key, unsigned long long time);
     virtual ofxTLFlag* getFlagWithKey(string key);
-	
+
+    //inline void setPageName(string pageName){ this->pageName = pageName; }
+    //inline string getPageName() { return this->pageName; }
+
 protected:
-    
+
     virtual ofxTLKeyframe* newKeyframe();
     virtual void restoreKeyframe(ofxTLKeyframe* key, ofxXmlSettings& xmlStore);
 	virtual void storeKeyframe(ofxTLKeyframe* key, ofxXmlSettings& xmlStore);
@@ -73,4 +76,5 @@ protected:
 	ofxTLFlag* clickedTextField;
 	bool enteringText;
 
+    //string pageName;
 };

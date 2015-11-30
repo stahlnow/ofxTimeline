@@ -38,7 +38,7 @@
 class ofxTimeline; //forward declare for sender pointer
 class ofxTLTrack;
 class ofxTLPlaybackEventArgs : public ofEventArgs {
-  public: 	
+  public:
     ofxTimeline* sender;
 	float currentPercent;
 	float currentTime;
@@ -52,12 +52,6 @@ class ofxTLZoomEventArgs : public ofEventArgs {
     ofxTimeline* sender;
 	ofRange currentZoom;
 	ofRange oldZoom;
-};
-
-class ofxTLInOutEventArgs : public ofEventArgs {
-public:
-    ofxTimeline* sender;
-    ofRange inoutRange;
 };
 
 class ofxTLPageEventArgs : public ofEventArgs {
@@ -79,6 +73,7 @@ class ofxTLBangEventArgs : public ofEventArgs {
   public:
     ofxTimeline* sender;
 	ofxTLTrack* track;
+    //string pageName;
 	float currentPercent;
 	float currentTime;
 	int currentFrame;
@@ -101,8 +96,6 @@ class ofxTLEvents {
 	ofEvent<ofxTLPlaybackEventArgs> playbackLooped;
 	ofEvent<ofxTLPlaybackEventArgs> playheadScrubbed;
 
-    ofEvent<ofxTLInOutEventArgs> inOutChanged;
-
 	ofEvent<ofxTLZoomEventArgs> zoomStarted;
 	ofEvent<ofxTLZoomEventArgs> zoomDragged;
 	ofEvent<ofxTLZoomEventArgs> zoomEnded;
@@ -110,12 +103,12 @@ class ofxTLEvents {
 	ofEvent<ofxTLBangEventArgs> bangFired;
 
 	ofEvent<ofxTLSwitchEventArgs> switched;
-	
+
 	ofEvent<ofxTLPageEventArgs> pageChanged;
-    
+
     ofEvent<ofxTLTrackEventArgs> trackGainedFocus;
     ofEvent<ofxTLTrackEventArgs> trackLostFocus;
-		
+
 	ofEvent<ofEventArgs> viewWasResized;
 
 

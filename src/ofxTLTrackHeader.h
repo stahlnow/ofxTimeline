@@ -5,7 +5,7 @@
  * Copyright (c) 2011-2012 James George
  * Development Supported by YCAM InterLab http://interlab.ycam.jp/en/
  * http://jamesgeorge.org + http://flightphase.com
- * http://github.com/obviousjim + http://github.com/flightphase 
+ * http://github.com/obviousjim + http://github.com/flightphase
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -40,50 +40,50 @@
 
 class ofxTLTrackHeader : public ofxTLTrack
 {
-  public:	
+  public:
 	ofxTLTrackHeader();
 	virtual ~ofxTLTrackHeader();
-	
+
     string name;
-    
+
     virtual void enable();
     virtual void disable();
-    
+
 	virtual void draw();
 	virtual void mousePressed(ofMouseEventArgs& args);
 	virtual void mouseMoved(ofMouseEventArgs& args);
 	virtual void mouseDragged(ofMouseEventArgs& args);
 	virtual void mouseReleased(ofMouseEventArgs& args);
-	
+
 	virtual void setTrack(ofxTLTrack* track);
 	virtual ofxTLTrack* getTrack();
-    
+
 	virtual void setFooterHeight(float height);
 	virtual void collapseTrack();
-    
+
 	virtual ofRectangle getFooterRect();
 	virtual void textFieldEnter(string& newText);
-	
+
 	//for the header, this returns the track's display name
     virtual string getDisplayName();
-	
+
   protected:
 	ofxTLTrack* track;
 	ofxTextInputField nameField;
-	
+
 	float footerHeight;
 	void recalculateFooter();
-	
+
 	ofRectangle footerRect;
-	
+
 	bool hoveringFooter;
 	bool draggingSize;
 	float dragOffset;
 	float dragAnchor;
-	
+
 	void recalculateFooterStripes();
 	float footerStripeWidth;
 	ofPath footerStripes;
-	
+
 };
 

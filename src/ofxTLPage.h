@@ -46,22 +46,22 @@ class ofxTimeline;
 class ofxTLTicker;
 class ofxTLPage {
   public:
-	
+
 	ofxTLPage();
 	virtual ~ofxTLPage();
-	
+
 	virtual void setup();
 	virtual void update();
 	virtual void draw();
 
 	virtual void setName(string name);
 	virtual string getName();
-	
-	
+
+
 	virtual void setContainer(ofVec2f offset, float width);
 	virtual void setHeaderHeight(float newHeaderHeight);
 	virtual void setDefaultTrackHeight(float newDefaultTrackHeight);
-	
+
 	void setMinimalHeaders(bool minimal);
 	void hideFooters(bool hide);
 	//collapses all track heights to 0;
@@ -70,77 +70,77 @@ class ofxTLPage {
 	void evenlyDistributeTrackHeights();
 	void expandFocusedTrack();
 	void setExpandToHeight(float height);
-		
+
 	virtual void setZoomBounds(ofRange zoomBounds);
-	
+
 	virtual void unselectAll();
     virtual void clear();
     virtual void save();
 
-    virtual void setFocusedTrack(ofxTLTrack* track);
     virtual ofxTLTrack* getFocusedTrack();
-	
-	virtual float getComputedHeight();	
+
+	virtual float getComputedHeight();
 	virtual float getBottomEdge();
     virtual ofRectangle getDrawRect();
-    
+
 	virtual void addTrack(string name, ofxTLTrack* track);
 	virtual ofxTLTrack* getTrack(string name);
     virtual ofxTLTrackHeader* getTrackHeader(ofxTLTrack* track);
-    
+
 	virtual void removeTrack(ofxTLTrack* track);
 
-    
+
     //computed on the fly so please use sparingly if you have to call it a lot
     vector<ofxTLTrack*>& getTracks();
 
     //given a folder the page will look for xml files to load within that
 	void loadTracksFromFolder(string folderPath);
     void saveTracksToFolder(string folderPath);
-	
+
 	//this will swap out the xml file names that have been set to default based on the timeline name
 	void timelineChangedName(string newName, string oldName);
-	
+
 	virtual void mousePressed(ofMouseEventArgs& args, long millis);
 	virtual void mouseMoved(ofMouseEventArgs& args, long millis);
 	virtual void mouseDragged(ofMouseEventArgs& args, long millis);
 	virtual void mouseReleased(ofMouseEventArgs& args, long millis);
-		
+
 	virtual void nudgeBy(ofVec2f nudgePercent);
-	
+
 	virtual void keyPressed(ofKeyEventArgs& args);
-	
+
 	virtual void saveTrackPositions();
 	virtual void loadTrackPositions();
-	
+
 	virtual void recalculateHeight();
-	
+
 	virtual void setTicker(ofxTLTicker* ticker);
-	
+
     virtual void timelineGainedFocus();
     virtual void timelineLostFocus();
-    
+
     void bringTrackToTop(ofxTLTrack* track);
     void bringTrackToBottom(ofxTLTrack* track);
+    void moveTrack(ofxTLTrack* track, bool up);
 
 	//copy paste
 	virtual void copyRequest(vector<string>& bufs);
 	virtual void cutRequest(vector<string>& bufs);
 	virtual void pasteSent(const vector<string>& pasteboard);
 	virtual void selectAll();
-	
+
 	virtual void setDragOffsetTime(long offsetMillis);
     virtual void setSnappingEnabled(bool enabled);
-    
+
     ofxTimeline* timeline;
-    
+
   protected:
 
 	//used for getting BPM snaps
 	vector<ofxTLTrackHeader*> headers;
 	map<string, ofxTLTrack*> tracks;
 	vector<ofxTLTrack*> trackList;
-	
+
     ofxTLTicker* ticker;
     ofxTLTrack* focusedTrack;
 
@@ -151,27 +151,27 @@ class ofxTLPage {
 	bool headerHasFocus;
 	bool footerIsDragging;
 	bool snappingEnabled;
-	
+
 	set<unsigned long long> snapPoints; //in millis
 	float snappingTolerance; //in pixels
 	virtual void zoomEnded(ofxTLZoomEventArgs& args);
-	
+
 	void refreshSnapPoints();
-	
+
 	long millisecondDragOffset;
-	
+
 	bool headersAreMinimal;
 	bool footersAreHidden;
     bool draggingSelectionRectangle;
     ofVec2f selectionRectangleAnchor;
     ofRectangle selectionRectangle;
-    
+
 	float heightBeforeCollapse;
 	ofRectangle trackContainerRect;
 	float headerHeight;
 	float defaultTrackHeight;
 	ofRange currentZoomBounds;
 
-	map<string, ofRectangle> savedTrackPositions;	
-	
+	map<string, ofRectangle> savedTrackPositions;
+
 };

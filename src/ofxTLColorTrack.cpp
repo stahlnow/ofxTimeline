@@ -195,7 +195,7 @@ void ofxTLColorTrack::drawModalContent(){
 }
 
 void ofxTLColorTrack::loadColorPalette(ofBaseHasPixels& image){
-	colorPallete.setFromPixels(image.getPixels());
+	//colorPallete.setFromPixels(image.getPixels()); // TODO
 	refreshAllSamples();
 }
 

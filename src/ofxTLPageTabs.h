@@ -44,25 +44,27 @@ typedef struct{
 class ofxTLPageTabs : public ofxTLTrack {
 
   public:
-	
+
 	virtual void setup();
 	virtual void draw();
 
 	virtual void addPage(string name);
+    virtual void removePage();
+    virtual void movePage(bool up);
 	virtual void selectPage(string name);
 	virtual void selectPage(int index);
 	virtual void changeName(string oldName, string newName);
-	
+
 	virtual void clear();
-	
+
 	virtual void mousePressed(ofMouseEventArgs& args);
 	virtual void mouseReleased(ofMouseEventArgs& args);
-	
+
 	virtual void keyPressed(ofKeyEventArgs& args);
-    
+
     virtual int getSelectedPageIndex();
     virtual string getSelectedPageName();
-	
+
   protected:
 	virtual void drawRectChanged();
 	int selectedPageIndex;

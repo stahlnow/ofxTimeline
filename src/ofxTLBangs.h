@@ -40,24 +40,29 @@ class ofxTLBangs : public ofxTLKeyframes {
   public:
     ofxTLBangs();
 	virtual ~ofxTLBangs();
-	
+
     virtual void draw();
 
     virtual void regionSelected(ofLongRange timeRange, ofRange valueRange);
 	virtual void playbackStarted(ofxTLPlaybackEventArgs& args);
 	virtual void playbackEnded(ofxTLPlaybackEventArgs& args);
 	virtual void playbackLooped(ofxTLPlaybackEventArgs& args);
-    
+
     virtual string getTrackType();
-    
+
+    //inline void setPageName(string pageName){ this->pageName = pageName; }
+    //inline string getPageName() { return this->pageName; }
+
  protected:
 
     virtual ofxTLKeyframe* keyframeAtScreenpoint(ofVec2f p);
 //    bool isPlayingBack;
 	virtual void update();
-	
+
     long lastTimelinePoint;
 	float lastBangTime; //just for display
-	
+
     virtual void bangFired(ofxTLKeyframe* key);
+
+    //string pageName;
 };
