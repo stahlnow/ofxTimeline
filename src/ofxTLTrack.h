@@ -103,6 +103,7 @@ class ofxTLTrack
     virtual void playbackStarted(ofxTLPlaybackEventArgs& args);
 	virtual void playbackLooped(ofxTLPlaybackEventArgs& args){};
 	virtual void playbackEnded(ofxTLPlaybackEventArgs& args){};
+    virtual void loopChanged(ofxTLPlaybackEventArgs& args){};
 
 	virtual void keyPressed(ofKeyEventArgs& args){};
 	virtual void nudgeBy(ofVec2f nudgePercent){};

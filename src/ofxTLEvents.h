@@ -94,6 +94,7 @@ class ofxTLEvents {
 	ofEvent<ofxTLPlaybackEventArgs> playbackStarted;
 	ofEvent<ofxTLPlaybackEventArgs> playbackEnded;
 	ofEvent<ofxTLPlaybackEventArgs> playbackLooped;
+    ofEvent<ofxTLPlaybackEventArgs> loopChanged;
 	ofEvent<ofxTLPlaybackEventArgs> playheadScrubbed;
 
 	ofEvent<ofxTLZoomEventArgs> zoomStarted;
@@ -117,6 +118,7 @@ class ofxTLEvents {
         ofAddListener(playbackStarted, listener, &ListenerClass::playbackStarted);
         ofAddListener(playbackEnded, listener, &ListenerClass::playbackEnded);
         ofAddListener(playbackLooped, listener, &ListenerClass::playbackLooped);
+        ofAddListener(loopChanged, listener, &ListenerClass::loopChanged);
     }
 
     template<class ListenerClass>
@@ -124,6 +126,7 @@ class ofxTLEvents {
         ofRemoveListener(playbackStarted, listener, &ListenerClass::playbackStarted);
         ofRemoveListener(playbackEnded, listener, &ListenerClass::playbackEnded);
         ofRemoveListener(playbackLooped, listener, &ListenerClass::playbackLooped);
+        ofRemoveListener(loopChanged, listener, &ListenerClass::loopChanged);
     }
 
     template<class ListenerClass>

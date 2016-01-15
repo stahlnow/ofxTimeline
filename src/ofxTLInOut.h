@@ -33,22 +33,30 @@
 #pragma once
 #include "ofMain.h"
 #include "ofxTLTrack.h"
+#include "ofxTextInputField.h"
+#include "ofRange.h"
 
 class ofxTLInOut : public ofxTLTrack {
   public:
     ofxTLInOut();
-    
+
     virtual void draw();
 	virtual void mousePressed(ofMouseEventArgs& args);
 	virtual void mouseMoved(ofMouseEventArgs& args);
 	virtual void mouseDragged(ofMouseEventArgs& args);
 	virtual void mouseReleased(ofMouseEventArgs& args);
-    
+
     virtual void load();
 	virtual void save();
-    
+
     void setPageRectangle(ofRectangle pageRectangle);
-    
+
+    inline void setLoopName(std::string n) { txtLoopName.text = n; }
+    inline std::string getLoopName() { return txtLoopName.text; }
+
+    inline ofFloatRange getRange() { return range; }
+    inline void setRange(ofFloatRange r) { range = r; }
+
   protected:
     float dragOffset;
     //if both are set then it's a selection range
@@ -56,6 +64,10 @@ class ofxTLInOut : public ofxTLTrack {
     bool draggingOut;
     bool hoveringIn;
     bool hoveringOut;
-	    
+
     ofRectangle pageRect;
+
+    ofxTextInputField txtLoopName;
+
+    ofFloatRange range;
 };

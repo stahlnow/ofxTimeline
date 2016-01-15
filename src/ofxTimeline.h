@@ -314,6 +314,13 @@ class ofxTimeline : ofThread {
 	virtual void setCurrentPage(string name);
 	virtual void setCurrentPage(int number);
 
+
+    virtual void addLoop(ofFloatRange range, string loopName);
+    ofxTLInOut* getLoop(string loopName);
+    inline ofxTLInOut* getCurrentLoop() { return currentLoop; }
+    void setCurrentLoop(ofxTLInOut* loop);
+    inline vector<ofxTLInOut*>& getLoops() { return loops; }
+
     //if a timeline is modal it means that it may be presenting
     //content outside of the timeline or requiring keyboard input
     //testApp should respect this value and not trigger other hotkeys
@@ -436,6 +443,8 @@ class ofxTimeline : ofThread {
 	ofxMSATimer& getTimer();
 	ofxTLZoomer* getZoomer();
 
+    inline ofxTLPageTabs* getTabs() { return tabs; }
+
 	vector<ofxTLPage*>& getPages();
 
 	ofVec2f getNudgePercent();
@@ -489,7 +498,9 @@ class ofxTimeline : ofThread {
     ofxTLEvents timelineEvents;
     ofxTLColors colors;
 
-    ofxTLInOut* inoutTrack;
+    vector<ofxTLInOut*> loops; // loops
+    ofxTLInOut* currentLoop; // current loop
+
 	ofxTLTicker* ticker;
 	ofxTLPageTabs* tabs;
 	ofxTLZoomer* zoomer;
@@ -562,9 +573,6 @@ class ofxTimeline : ofThread {
 
 
 	string defaultPalettePath;
-
-    //TODO convert to ofLongRange
-	ofRange inoutRange;
 
     bool timelineHasFocus;
 

@@ -46,7 +46,7 @@ bool headersort(ofxTLTrackHeader* a, ofxTLTrackHeader* b){
 #define TAB_HEIGHT 18
 #define TICKER_HEIGHT 27
 #define ZOOMER_HEIGHT 14
-#define INOUT_HEIGHT 7
+#define INOUT_HEIGHT 27
 
 ofxTimeline::ofxTimeline()
 :	width(1024),
@@ -70,11 +70,10 @@ ofxTimeline::ofxTimeline()
 	dragMillsecondOffset(0),
 	movePlayheadOnPaste(true),
 	movePlayheadOnDrag(false),
-	inoutRange(ofRange(0.0,1.0)),
 	currentPage(NULL),
 	modalTrack(NULL),
     tabs(NULL),
-	inoutTrack(NULL),
+	currentLoop(NULL),
 	ticker(NULL),
 	zoomer(NULL),
 	timeControl(NULL),
@@ -110,7 +109,6 @@ ofxTimeline::~ofxTimeline(){
 		reset();
 
         delete tabs;
-		delete inoutTrack;
         delete ticker;
         delete zoomer;
 	}
@@ -131,12 +129,7 @@ void ofxTimeline::setup(){
 	tabs->setup();
 	tabs->setDrawRect(ofRectangle(offset.x, offset.y, width, TAB_HEIGHT));
 
-	if(inoutTrack != NULL){
-		delete inoutTrack;
-	}
-    inoutTrack = new ofxTLInOut();
-    inoutTrack->setTimeline(this);
-    inoutTrack->setDrawRect(ofRectangle(offset.x, tabs->getBottomEdge(), width, INOUT_HEIGHT));
+    addLoop(ofFloatRange(0.0, 0.1), "loop");
 
 	if(ticker != NULL){
 		delete ticker;
@@ -146,7 +139,7 @@ void ofxTimeline::setup(){
 
     //TODO: save ticker playhead position
 	ticker->setup();
-	ticker->setDrawRect(ofRectangle(offset.x, inoutTrack->getBottomEdge(), width, TICKER_HEIGHT));
+	ticker->setDrawRect(ofRectangle(offset.x, currentLoop->getBottomEdge(), width, TICKER_HEIGHT));
 	if(zoomer != NULL){
 		delete zoomer;
 	}
@@ -198,15 +191,11 @@ void ofxTimeline::setName(string newName){
 	    name = newName;
 		if(isSetup){
 //			setupStandardElements();
-			string inoutTrackName = inoutTrack->getXMLFileName();
-			ofStringReplace(inoutTrackName, oldName+"_", newName+"_");
-			inoutTrack->setXMLFileName(inoutTrackName);
-
 			string zoomerTrackName = zoomer->getXMLFileName();
 			ofStringReplace(zoomerTrackName, oldName+"_", newName+"_");
 			zoomer->setXMLFileName(zoomerTrackName);
 
-			for(int i = 0; i < pages.size(); i++){
+			for (int i = 0; i < pages.size(); i++) {
 				pages[i]->timelineChangedName(newName, oldName);
 			}
 		}
@@ -216,9 +205,6 @@ void ofxTimeline::setName(string newName){
 void ofxTimeline::setupStandardElements(){
 
 //	cout << "*****TL setting up standard path " << ofToDataPath(workingFolder + name + "_inout.xml") << endl;
-
-	inoutTrack->setXMLFileName( ofToDataPath(workingFolder + name + "_inout.xml") );
-	inoutTrack->setup();
 
 	zoomer->setXMLFileName( ofToDataPath(workingFolder + name + "_zoomer.xml") );
 	zoomer->setup();
@@ -265,10 +251,6 @@ void ofxTimeline::saveTracksToFolder(string folderPath){
 	string filename = folderPath + zoomer->getXMLFileName();
 	zoomer->setXMLFileName(filename);
 	zoomer->save();
-
-	filename = folderPath + inoutTrack->getXMLFileName();
-	inoutTrack->setXMLFileName(filename);
-	inoutTrack->save();
 
 	setWorkingFolder(folderPath);
 }
@@ -502,7 +484,7 @@ void ofxTimeline::save(){
         pages[i]->save();
     }
 	zoomer->save();
-	inoutTrack->save();
+	// TODO SAVE LOOPS
 	unsavedChanges = false;
 }
 
@@ -693,7 +675,7 @@ void ofxTimeline::setInPointAtPlayhead(){
     setInPointAtSeconds(currentTime);
 }
 void ofxTimeline::setInPointAtPercent(float percent){
-	inoutRange.min = ofClamp(percent, 0, inoutRange.max);
+	currentLoop->getRange().setMin(ofClamp(percent, 0, currentLoop->getRange().max));
 }
 void ofxTimeline::setInPointAtSeconds(float time){
 	setInPointAtPercent(time/durationInSeconds);
@@ -712,7 +694,7 @@ void ofxTimeline::setOutPointAtPlayhead(){
     setOutPointAtSeconds(currentTime);
 }
 void ofxTimeline::setOutPointAtPercent(float percent){
-	inoutRange.max = ofClamp(percent, inoutRange.min, 1.0);
+	currentLoop->getRange().setMax(ofClamp(percent, currentLoop->getRange().min, 1.0));
 }
 void ofxTimeline::setOutPointAtFrame(float frame){
     setOutPointAtPercent(timecode.secondsForFrame(frame) / durationInSeconds);
@@ -729,21 +711,21 @@ void ofxTimeline::setOutPointAtTimecode(string timecodeString){
 
 void ofxTimeline::setInOutRange(ofRange inoutPercentRange){
     if(inoutPercentRange.min > inoutPercentRange.max) return;
-	inoutRange = inoutPercentRange;
+	currentLoop->setRange(inoutPercentRange);
 }
 
 void ofxTimeline::setInOutRangeMillis(unsigned long long min, unsigned long long max){
-	inoutRange = ofRange(min / (durationInSeconds*1000.),
-						 max / (durationInSeconds*1000.) );
-//	cout << "new range is " << inoutRange << endl;
+	currentLoop->setRange(ofRange(min / (durationInSeconds*1000.),
+						 max / (durationInSeconds*1000.) ));
+//	cout << "new range is " << currentLoop->getRange() << endl;
 }
 
 void ofxTimeline::setCurrentTimeToInPoint(){
-    setPercentComplete(inoutRange.min);
+    setPercentComplete(currentLoop->getRange().min);
 }
 
 void ofxTimeline::setCurrentTimeToOutPoint(){
-    setPercentComplete(inoutRange.max);
+    setPercentComplete(currentLoop->getRange().max);
 }
 
 void ofxTimeline::clearInOut(){
@@ -751,7 +733,7 @@ void ofxTimeline::clearInOut(){
 }
 
 ofRange ofxTimeline::getInOutRange(){
-	return inoutRange;
+	return currentLoop->getRange();
 }
 
 ofLongRange ofxTimeline::getInOutRangeMillis(){
@@ -767,11 +749,11 @@ int ofxTimeline::getOutFrame(){
 }
 
 float ofxTimeline::getInTimeInSeconds(){
-	return durationInSeconds*inoutRange.min;
+	return durationInSeconds*currentLoop->getRange().min;
 }
 
 float ofxTimeline::getOutTimeInSeconds(){
-	return durationInSeconds*inoutRange.max;
+	return durationInSeconds*currentLoop->getRange().max;
 }
 
 long ofxTimeline::getInTimeInMillis(){
@@ -833,14 +815,15 @@ void ofxTimeline::reset(){ //gets rid of everything
         return;
     }
 
-
-
 	if(isOnThread){
 		waitForThread(true);
 	}
 
     disable();
     undoStack.clear();
+
+    loops.clear();
+
     for(int i = 0; i < pages.size(); i++){
         delete pages[i];
     }
@@ -872,8 +855,8 @@ void ofxTimeline::setDurationInFrames(int frames){
 
 void ofxTimeline::setDurationInSeconds(float seconds){
 
-	bool updateInTime = inoutRange.min > 0.;
-	bool updateOutTime = inoutRange.max < 1.;
+	bool updateInTime = currentLoop->getRange().min > 0.;
+	bool updateOutTime = currentLoop->getRange().max < 1.;
 
 	float inTimeSeconds  = getInTimeInSeconds();
 	float outTimeSeconds = getOutTimeInSeconds();
@@ -1171,7 +1154,10 @@ void ofxTimeline::mousePressed(ofMouseEventArgs& args){
 		timelineHasFocus = focus;
 		if(timelineHasFocus){
 			tabs->mousePressed(args);
-			inoutTrack->mousePressed(args);
+			//inoutTrack->mousePressed(args);
+            for (int i = 0; i < loops.size(); i++) {
+                loops[i]->mousePressed(args);
+            }
 			ticker->mousePressed(args);
 			currentPage->mousePressed(args,millis);
 			zoomer->mousePressed(args);
@@ -1199,7 +1185,9 @@ void ofxTimeline::mouseMoved(ofMouseEventArgs& args){
         return;
     }
 
-    inoutTrack->mouseMoved(args);
+    for (int i = 0; i < loops.size(); i++) {
+        loops[i]->mouseMoved(args);
+    }
 	ticker->mouseMoved(args);
 	currentPage->mouseMoved(args, millis);
 	zoomer->mouseMoved(args);
@@ -1217,7 +1205,9 @@ void ofxTimeline::mouseDragged(ofMouseEventArgs& args){
         return;
     }
 
-	inoutTrack->mouseDragged(args);
+    for (int i = 0; i < loops.size(); i++) {
+        loops[i]->mouseDragged(args);
+    }
 	ticker->mouseDragged(args);
 	currentPage->mouseDragged(args, millis);
 	zoomer->mouseDragged(args);
@@ -1236,7 +1226,9 @@ void ofxTimeline::mouseReleased(ofMouseEventArgs& args){
     	modalTrack->mouseReleased(args, millis);
 	}
     else{
-		inoutTrack->mouseReleased(args);
+        for (int i = 0; i < loops.size(); i++) {
+            loops[i]->mouseReleased(args);
+        }
 		ticker->mouseReleased(args);
 		tabs->mouseReleased(args);
 		currentPage->mouseReleased(args, millis);
@@ -1418,11 +1410,17 @@ void ofxTimeline::recalculateBoundingRects(){
 		tabs->setDrawRect(ofRectangle(offset.x, offset.y, width, 0));
 	}
 
-    inoutTrack->setDrawRect( ofRectangle(offset.x, tabs->getBottomEdge(), width, showInoutControl ? INOUT_HEIGHT : 0) );
-    ticker->setDrawRect( ofRectangle(offset.x, inoutTrack->getBottomEdge(), width, showTicker ? TICKER_HEIGHT : 0) );
+    for (int i = 0; i < loops.size(); i++) {
+        loops[i]->setDrawRect( ofRectangle(offset.x, tabs->getBottomEdge(), width, showInoutControl ? INOUT_HEIGHT : 0) );
+    }
+
+    ticker->setDrawRect( ofRectangle(offset.x, currentLoop->getBottomEdge(), width, showTicker ? TICKER_HEIGHT : 0) );
     updatePagePositions();
 	zoomer->setDrawRect(ofRectangle(offset.x, currentPage->getBottomEdge(), width, showZoomer ? ZOOMER_HEIGHT : 0));
-    inoutTrack->setPageRectangle(currentPage->getDrawRect());
+
+    for (int i = 0; i < loops.size(); i++) {
+        loops[i]->setPageRectangle(currentPage->getDrawRect());
+    }
 	ofRectangle tickerRect = ofRectangle(offset.x, ticker->getDrawRect().y,
                                         width, currentPage->getBottomEdge()-ticker->getDrawRect().y);
 	ticker->setTotalDrawRect(tickerRect);
@@ -1455,7 +1453,7 @@ ofLoopType ofxTimeline::getLoopType(){
 }
 
 bool ofxTimeline::isDone(){
-	return getPercentComplete() >= inoutRange.max && getLoopType() == OF_LOOP_NONE;
+	return getPercentComplete() >= currentLoop->getRange().max && getLoopType() == OF_LOOP_NONE;
 }
 
 void ofxTimeline::update(ofEventArgs& updateArgs){
@@ -1495,21 +1493,21 @@ void ofxTimeline::checkEvents(){
 }
 
 void ofxTimeline::checkLoop(){
-	if(currentTime < durationInSeconds*inoutRange.min){
-        currentTime = durationInSeconds*inoutRange.min;
+	if(currentTime < durationInSeconds*currentLoop->getRange().min){
+        currentTime = durationInSeconds*currentLoop->getRange().min;
         playbackStartTime = timer.getAppTimeSeconds() - currentTime;
         playbackStartFrame = ofGetFrameNum() - timecode.frameForSeconds(currentTime);
     }
 
-    if(currentTime >= durationInSeconds*inoutRange.max){
+    if(currentTime >= durationInSeconds*currentLoop->getRange().max){
         if(loopType == OF_LOOP_NONE){
-            currentTime = durationInSeconds*inoutRange.max;
+            currentTime = durationInSeconds*currentLoop->getRange().max;
             stop();
         }
         else if(loopType == OF_LOOP_NORMAL) {
-            currentTime = durationInSeconds*inoutRange.min + (currentTime - durationInSeconds*inoutRange.max);
-            playbackStartFrame += getDurationInFrames()  * inoutRange.span();
-            playbackStartTime  += getDurationInSeconds() * inoutRange.span();
+            currentTime = durationInSeconds*currentLoop->getRange().min + (currentTime - durationInSeconds*currentLoop->getRange().max);
+            playbackStartFrame += getDurationInFrames()  * currentLoop->getRange().span();
+            playbackStartTime  += getDurationInSeconds() * currentLoop->getRange().span();
             ofxTLPlaybackEventArgs args = createPlaybackEvent();
             ofNotifyEvent(events().playbackLooped, args);
         }
@@ -1543,7 +1541,11 @@ void ofxTimeline::draw(){
 
 		//draw these because they overlay the rest of the timeline with info
         ticker->_draw();
-		inoutTrack->_draw();
+
+        for (int i = 0; i < loops.size(); i++) {
+           loops[i]->_draw();
+        }
+
         ofPopStyle();
 
 		if(modalTrack != NULL){
@@ -1555,6 +1557,41 @@ void ofxTimeline::draw(){
 	}
 
 }
+
+void ofxTimeline::setCurrentLoop(ofxTLInOut* loop) {
+    currentTime = 0; // hack to set correct time with checkLoop()
+    currentLoop = loop;
+    checkLoop();
+
+    ofxTLPlaybackEventArgs args = createPlaybackEvent();
+    ofNotifyEvent(timelineEvents.loopChanged, args);
+}
+
+void ofxTimeline::addLoop(ofFloatRange range, string loopName) {
+    ofxTLInOut* newLoop = new ofxTLInOut();
+    newLoop->setRange(range);
+    newLoop->setLoopName(loopName);
+    newLoop->setTimeline(this);
+    newLoop->setDrawRect(ofRectangle(offset.x, tabs->getBottomEdge(), width, INOUT_HEIGHT));
+    loops.push_back(newLoop);
+    currentLoop = newLoop;
+
+    ofEventArgs args;
+    ofNotifyEvent(events().viewWasResized, args);
+}
+
+ofxTLInOut* ofxTimeline::getLoop(string loopName) {
+
+    for(vector<ofxTLInOut*>::iterator it =  loops.begin(); it != loops.end(); it++){
+        if((*it)->getLoopName() == loopName){
+            return (*it);
+        }
+    }
+
+    ofLogError("ofxTimeline -- Couldn't find loop " + loopName);
+    return NULL;
+}
+
 
 #pragma mark ELEMENT CREATORS/GETTERS/SETTERS
 void ofxTimeline::addPage(string pageName, bool makeCurrent){
