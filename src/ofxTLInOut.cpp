@@ -106,13 +106,22 @@ void ofxTLInOut::draw(){
     txtLoopName.bounds.setWidth( abs(outPointX - inPointX - 34.0 ));
     txtLoopName.bounds.y = bounds.y + 5;
     ofSetColor(timeline->getColors().keyColor);
-    ofNoFill();
-    ofRect(txtLoopName.bounds);
-    if(hoveringIn || hoveringOut){
-        ofSetColor(timeline->getColors().highlightColor);
+    if (this == timeline->getCurrentLoop()) {
+        ofFill();
+    } else {
+        ofNoFill();
     }
-    else{
-        ofSetColor(timeline->getColors().keyColor);
+    ofRect(txtLoopName.bounds);
+    if (this == timeline->getCurrentLoop()) {
+        ofSetColor(timeline->getColors().backgroundColor);
+    }
+    else {
+        if(hoveringIn || hoveringOut){
+            ofSetColor(timeline->getColors().highlightColor);
+        }
+        else{
+            ofSetColor(timeline->getColors().keyColor);
+        }
     }
     txtLoopName.draw();
 
